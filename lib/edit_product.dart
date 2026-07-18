@@ -220,7 +220,7 @@ class _EditProductScreenState extends State<EditProductScreen>
                                     ? 'MM / DD / YYYY'
                                     : '${_expirationDate!.month.toString().padLeft(2, '0')}/${_expirationDate!.day.toString().padLeft(2, '0')}/${_expirationDate!.year}',
                                 style: TextStyle(
-                                  color: _expirationDate == null ? Colors.grey : kInk,
+                                  color: _expirationDate == null ? Colors.grey : inkOn(context),
                                   fontWeight: _expirationDate == null ? FontWeight.normal : FontWeight.w600,
                                 ),
                               ),
@@ -244,11 +244,14 @@ class _EditProductScreenState extends State<EditProductScreen>
     );
   }
 
-  Widget _label(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kInk, letterSpacing: 0.3),
+  Widget _label(String text) => Builder(
+        builder: (context) => Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            text,
+            style: TextStyle(
+                fontSize: 11, fontWeight: FontWeight.w600, color: inkOn(context), letterSpacing: 0.3),
+          ),
         ),
       );
 }
@@ -271,6 +274,7 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -278,7 +282,7 @@ class _SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: kInk.withOpacity(0.04),
+            color: Colors.black.withOpacity(isDark ? 0.25 : 0.04),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -291,13 +295,13 @@ class _SectionCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 15,
-                backgroundColor: kPinkSoft,
-                child: Icon(icon, size: 15, color: kPinkPrimary),
+                backgroundColor: isDark ? kPurplePrimary.withOpacity(0.25) : kPinkSoft,
+                child: Icon(icon, size: 15, color: isDark ? kPurplePrimary : kPinkPrimary),
               ),
               const SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kInk),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: inkOn(context)),
               ),
             ],
           ),

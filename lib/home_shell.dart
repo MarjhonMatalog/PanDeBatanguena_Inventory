@@ -19,13 +19,11 @@ class HomeShell extends StatelessWidget {
     required this.selectedIndex,
     required this.notificationsEnabled,
     required this.accentColor,
-    required this.themeMode,
     required this.onIndexChanged,
     required this.onUpdateProduct,
     required this.onDeleteProduct,
     required this.onAdjustStock,
     required this.onRestockProduct,
-    required this.onChangeTheme,
     required this.onChangeAccentColor,
     required this.onToggleNotifications,
   });
@@ -35,13 +33,11 @@ class HomeShell extends StatelessWidget {
   final int selectedIndex;
   final bool notificationsEnabled;
   final Color accentColor;
-  final ThemeMode themeMode;
   final ValueChanged<int> onIndexChanged;
   final Future<void> Function(Product, {int? previousQuantity}) onUpdateProduct;
   final Future<void> Function(Product) onDeleteProduct;
   final Future<Product> Function(Product, int) onAdjustStock;
   final Future<void> Function(Product, int) onRestockProduct;
-  final ValueChanged<ThemeMode> onChangeTheme;
   final ValueChanged<Color> onChangeAccentColor;
   final ValueChanged<bool> onToggleNotifications;
 
@@ -60,10 +56,8 @@ class HomeShell extends StatelessWidget {
       ),
       ReportsPage(products: products, inventoryService: inventoryService),
       SettingsPage(
-        themeMode: themeMode,
         accentColor: accentColor,
         notificationsEnabled: notificationsEnabled,
-        onChangeTheme: onChangeTheme,
         onChangeAccentColor: onChangeAccentColor,
         onToggleNotifications: onToggleNotifications,
       ),
@@ -116,10 +110,12 @@ class HomeShell extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 28,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.cake_rounded, color: kPinkPrimary),
+                    child: ClipOval(
+                      child: BakeryLogo(size: 44),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(

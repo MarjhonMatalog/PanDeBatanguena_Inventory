@@ -45,11 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     width: 80,
                     height: 80,
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: kPinkSoft,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Icon(Icons.cake_rounded, color: kPinkPrimary, size: 36),
+                    child: BakeryLogo(size: 60),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -59,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: kInk,
+                    color: inkOn(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -73,11 +74,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration:
-                      const InputDecoration(hintText: 'baker@pandebatanguena.com'),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Please enter your email'
-                      : null,
+                  decoration: const InputDecoration(
+                    hintText: 'Enter Email',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    final email = value.trim();
+                    final emailRegex = RegExp(
+                      r'^[\w\-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
+                    if (!emailRegex.hasMatch(email)) {
+                      return 'Please enter a valid email address';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 _fieldLabel('PASSWORD'),
@@ -85,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: _obscure,
                   decoration: InputDecoration(
-                    hintText: '••••••••',
+                    hintText: 'Enter Password',
                     suffixIcon: TextButton(
                       onPressed: () => setState(() => _obscure = !_obscure),
                       child: Text(
@@ -111,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Center(
                   child: RichText(
                     text: TextSpan(
-                      style: TextStyle(color: kInk, fontSize: 13),
+                      style: TextStyle(color: inkOn(context), fontSize: 13),
                       children: const [
                         TextSpan(text: "Don't have an account? "),
                         TextSpan(
@@ -134,14 +146,16 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _fieldLabel(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: kInk,
+  Widget _fieldLabel(String text) => Builder(
+        builder: (context) => Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: inkOn(context),
+            ),
           ),
         ),
       );

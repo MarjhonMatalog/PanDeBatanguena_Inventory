@@ -8,18 +8,14 @@ import 'constants.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({
     super.key,
-    required this.themeMode,
     required this.accentColor,
     required this.notificationsEnabled,
-    required this.onChangeTheme,
     required this.onChangeAccentColor,
     required this.onToggleNotifications,
   });
 
-  final ThemeMode themeMode;
   final Color accentColor;
   final bool notificationsEnabled;
-  final ValueChanged<ThemeMode> onChangeTheme;
   final ValueChanged<Color> onChangeAccentColor;
   final ValueChanged<bool> onToggleNotifications;
 
@@ -31,12 +27,16 @@ class SettingsPage extends StatelessWidget {
         Card(
           child: Column(
             children: [
-              SwitchListTile(
-                secondary: const Icon(Icons.dark_mode_outlined, color: kPinkPrimary),
+              ListTile(
+                leading: const Icon(Icons.dark_mode_outlined, color: kPinkPrimary),
                 title: const Text('Dark Mode'),
-                value: themeMode == ThemeMode.dark,
-                activeColor: kPinkPrimary,
-                onChanged: (value) => onChangeTheme(value ? ThemeMode.dark : ThemeMode.light),
+                subtitle: const Text('Follows your device system setting'),
+                trailing: Icon(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Icons.dark_mode_rounded
+                      : Icons.light_mode_rounded,
+                  color: kPinkPrimary,
+                ),
               ),
               const Divider(height: 1),
               SwitchListTile(
@@ -71,36 +71,6 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Accent Color', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  children: [
-                    kPinkPrimary,
-                    kPinkAccent,
-                    const Color(0xFFC2185B),
-                    const Color(0xFFF48FB1),
-                  ].map((color) {
-                    return GestureDetector(
-                      onTap: () => onChangeAccentColor(color),
-                      child: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: color,
-                        child: accentColor == color ? const Icon(Icons.check, color: Colors.white, size: 16) : null,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -172,7 +142,13 @@ class AboutPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(radius: 40, backgroundColor: kPinkSoft, child: Icon(Icons.cake_rounded, color: kPinkPrimary, size: 32)),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.white,
+                  child: ClipOval(
+                    child: BakeryLogo(size: 64),
+                  ),
+                ),
                 const SizedBox(height: 16),
                 const Text(kAppName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),

@@ -202,7 +202,7 @@ class _StatCard extends StatelessWidget {
                   style: TextStyle(fontSize: 11, color: Colors.grey, letterSpacing: 0.4)),
               const SizedBox(height: 2),
               Text(value,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: kInk)),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: inkOn(context))),
             ],
           ),
         ),

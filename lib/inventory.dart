@@ -67,8 +67,9 @@ class _InventoryPageState extends State<InventoryPage> {
                   child: ChoiceChip(
                     label: Text(filter),
                     selected: selected,
-                    selectedColor: kPinkPrimary,
-                    labelStyle: TextStyle(color: selected ? Colors.white : kInk),
+                    selectedColor:
+                        Theme.of(context).brightness == Brightness.dark ? kPurplePrimary : kPinkPrimary,
+                    labelStyle: TextStyle(color: selected ? Colors.white : inkOn(context)),
                     onSelected: (_) => setState(() => _filter = filter),
                   ),
                 );

@@ -21,7 +21,6 @@ class SweetStockApp extends StatefulWidget {
 }
 
 class _SweetStockAppState extends State<SweetStockApp> {
-  ThemeMode _themeMode = ThemeMode.light;
   Color _accentColor = kPinkPrimary;
   bool _notificationsEnabled = true;
 
@@ -29,8 +28,6 @@ class _SweetStockAppState extends State<SweetStockApp> {
   final FirestoreInventoryService _inventoryService = FirestoreInventoryService();
 
   int _selectedIndex = 0;
-
-  void _changeTheme(ThemeMode mode) => setState(() => _themeMode = mode);
 
   void _changeAccentColor(Color color) => setState(() => _accentColor = color);
 
@@ -77,36 +74,36 @@ class _SweetStockAppState extends State<SweetStockApp> {
     final baseTextTheme = ThemeData.light().textTheme;
 
     ThemeData buildTheme(Brightness brightness) {
+      final isDark = brightness == Brightness.dark;
+      // In dark mode we seed with the bakery purple (matching the logo)
+      // instead of the pink accent, since pink-on-black reads muddier than
+      // pink-on-white. Light mode is unchanged.
       final scheme = ColorScheme.fromSeed(
-        seedColor: _accentColor,
+        seedColor: isDark ? kPurplePrimary : _accentColor,
         brightness: brightness,
+      ).copyWith(
+        secondary: kPinkAccent,
+        error: isDark ? const Color(0xFFCF6679) : null,
       );
       return ThemeData(
         useMaterial3: true,
         colorScheme: scheme,
-        scaffoldBackgroundColor:
-            brightness == Brightness.light ? const Color(0xFFFFF8FA) : null,
-        textTheme: brightness == Brightness.light
-            ? baseTextTheme
-            : ThemeData.dark().textTheme,
+        scaffoldBackgroundColor: isDark ? kDarkBackground : const Color(0xFFFFF8FA),
+        textTheme: isDark ? ThemeData.dark().textTheme : baseTextTheme,
         appBarTheme: AppBarTheme(
-          backgroundColor:
-              brightness == Brightness.light ? Colors.white : null,
-          foregroundColor: kInk,
+          backgroundColor: isDark ? kDarkBackgroundAlt : Colors.white,
+          foregroundColor: isDark ? kInkDark : kInk,
           elevation: 0,
           centerTitle: false,
         ),
         cardTheme: CardThemeData(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          color: brightness == Brightness.light
-              ? Colors.white
-              : const Color(0xFF232330),
+          color: isDark ? kDarkCard : Colors.white,
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor:
-              brightness == Brightness.light ? kPinkSoft.withOpacity(0.4) : null,
+          fillColor: isDark ? kDarkSurface : kPinkSoft.withOpacity(0.4),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide.none,
@@ -114,7 +111,7 @@ class _SweetStockAppState extends State<SweetStockApp> {
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: kPinkPrimary,
+            backgroundColor: isDark ? kPurplePrimary : kPinkPrimary,
             foregroundColor: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -122,13 +119,12 @@ class _SweetStockAppState extends State<SweetStockApp> {
           ),
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          selectedItemColor: kPinkPrimary,
+          selectedItemColor: isDark ? kPurplePrimary : kPinkPrimary,
           unselectedItemColor: Colors.grey,
-          backgroundColor:
-              brightness == Brightness.light ? Colors.white : null,
+          backgroundColor: isDark ? kDarkBackgroundAlt : Colors.white,
         ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: kPinkPrimary,
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: isDark ? kPurplePrimary : kPinkPrimary,
           foregroundColor: Colors.white,
         ),
       );
@@ -137,7 +133,10 @@ class _SweetStockAppState extends State<SweetStockApp> {
     return MaterialApp(
       title: kAppName,
       debugShowCheckedModeBanner: false,
-      themeMode: _themeMode,
+      // Adaptive dark mode: follow the device's system setting automatically.
+      // No manual in-app toggle — Android/iOS system settings are the source
+      // of truth, per Material 3 guidance.
+      themeMode: ThemeMode.system,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
       initialRoute: '/',
@@ -163,13 +162,11 @@ class _SweetStockAppState extends State<SweetStockApp> {
                     selectedIndex: _selectedIndex,
                     notificationsEnabled: _notificationsEnabled,
                     accentColor: _accentColor,
-                    themeMode: _themeMode,
                     onIndexChanged: (value) => setState(() => _selectedIndex = value),
                     onUpdateProduct: _updateProduct,
                     onDeleteProduct: _deleteProduct,
                     onAdjustStock: _adjustStock,
                     onRestockProduct: _restockProduct,
-                    onChangeTheme: _changeTheme,
                     onChangeAccentColor: _changeAccentColor,
                     onToggleNotifications: _toggleNotifications,
                   ),

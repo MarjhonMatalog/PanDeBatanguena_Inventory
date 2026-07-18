@@ -25,8 +25,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? kDarkBackground : Colors.white,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -34,15 +35,16 @@ class _SplashScreenState extends State<SplashScreen> {
             Container(
               width: 100,
               height: 100,
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: kPinkSoft,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                   color: kPinkAccent.withOpacity(0.6),
                   width: 1.4,
                 ),
               ),
-              child: Icon(Icons.cake_rounded, color: kPinkPrimary, size: 42),
+              child: BakeryLogo(size: 76),
             ),
             const SizedBox(height: 24),
             Text(
@@ -51,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: kInk,
+                color: inkOn(context),
               ),
             ),
             const SizedBox(height: 8),
