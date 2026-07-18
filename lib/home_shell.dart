@@ -180,7 +180,11 @@ class HomeShell extends StatelessWidget {
           ],
         ),
       ),
-      body: IndexedStack(index: selectedIndex, children: pages),
+      // _AnimatedTabBody keeps all four pages permanently alive via
+      // IndexedStack (so their StreamBuilders stay subscribed and never
+      // reload), and layers a Tween-driven fade/slide on top purely for the
+      // visual transition. Nothing is destroyed or rebuilt on tab switch.
+      body: _AnimatedTabBody(index: selectedIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: onIndexChanged,
@@ -208,4 +212,70 @@ class HomeShell extends StatelessWidget {
     Icons.bar_chart_rounded,
     Icons.settings_rounded,
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Tab body wrapper — keeps every tab's widget subtree permanently alive via
+// [IndexedStack] (so each page's StreamBuilder stays subscribed and never
+// shows a loading state again after its first load), while still animating
+// the tab switch itself using an explicit Tween-driven fade + slide.
+// ---------------------------------------------------------------------------
+class _AnimatedTabBody extends StatefulWidget {
+  const _AnimatedTabBody({required this.index, required this.children});
+
+  final int index;
+  final List<Widget> children;
+
+  @override
+  State<_AnimatedTabBody> createState() => _AnimatedTabBodyState();
+}
+
+class _AnimatedTabBodyState extends State<_AnimatedTabBody>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 260),
+    );
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.02),
+      end: Offset.zero,
+    ).animate(_fade);
+    _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedTabBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.index != widget.index) {
+      // Replay the tween from the start on every tab change. The
+      // IndexedStack below swaps instantly underneath; this animation is
+      // purely a visual transition layered on top of it.
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: IndexedStack(index: widget.index, children: widget.children),
+      ),
+    );
+  }
 }

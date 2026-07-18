@@ -22,19 +22,33 @@ class FirestoreInventoryService {
   CollectionReference<Map<String, dynamic>> get _movementsRef =>
       _firestore.collection('stock_movements');
 
+  // Cached streams. StreamBuilder resets to a loading state whenever it's
+  // handed a *new* Stream instance (via `!=` identity check), even if that
+  // stream is conceptually "the same" query. Since getProductsStream() and
+  // getMovementsStream() get called again on every rebuild of whatever
+  // widget holds the StreamBuilder (e.g. every tab switch), we cache the
+  // stream the first time it's built and hand back that same instance every
+  // time after — so switching tabs never shows a loading flash again.
+  Stream<List<Product>>? _productsStream;
+  Stream<List<StockMovement>>? _movementsStream;
+
   /// Live stream of all products, newest first. The Dashboard and
   /// Inventory pages rebuild automatically whenever this stream emits.
   Stream<List<Product>> getProductsStream() {
-    return _productsRef.orderBy('dateAdded', descending: true).snapshots().map(
-          (snapshot) => snapshot.docs.map(Product.fromFirestore).toList(),
-        );
+    return _productsStream ??= _productsRef
+        .orderBy('dateAdded', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map(Product.fromFirestore).toList())
+        .asBroadcastStream();
   }
 
   /// Live stream of all stock movements, newest first.
   Stream<List<StockMovement>> getMovementsStream() {
-    return _movementsRef.orderBy('timestamp', descending: true).snapshots().map(
-          (snapshot) => snapshot.docs.map(StockMovement.fromFirestore).toList(),
-        );
+    return _movementsStream ??= _movementsRef
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map(StockMovement.fromFirestore).toList())
+        .asBroadcastStream();
   }
 
   Future<void> _logMovement({
