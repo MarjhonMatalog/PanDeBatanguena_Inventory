@@ -546,8 +546,9 @@ Realistic next steps based on what currently exists (not invented feature ideas)
 
 | Name | Role |
 |---|---|
-| _Your Name Here_ | Project Owner / Developer |
-| _Contributor Name_ | Contributor |
+| _Mar Jhon Lowie Matalog_ | Project Owner / Developer |
+| _John Cedrick Deriquito_ | Contributor |
+| _Larz Byron Ingco_ | Contributor |
 
 ---
 
