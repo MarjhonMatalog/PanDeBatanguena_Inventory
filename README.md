@@ -570,4 +570,3 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software...
 ```
 
-Replace this placeholder with your actual chosen license before distributing the project.
