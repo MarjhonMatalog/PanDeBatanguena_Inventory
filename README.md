@@ -95,12 +95,6 @@ Only features that exist in the current codebase are listed below.
 - Links to Bakery Information and About
 - Logout (returns to the login screen)
 
-### 🏪 Bakery Information
-- Static bakery details page (name, address, contact, email, operating hours)
-
-### ℹ️ About
-- App name, description, and version info
-
 ### Not present in this project
 - Point of Sale (POS)
 - Orders module
