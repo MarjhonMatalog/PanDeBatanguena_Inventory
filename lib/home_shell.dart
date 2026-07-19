@@ -133,26 +133,6 @@ class HomeShell extends StatelessWidget {
                 ],
               ),
             ),
-            for (int i = 0; i < _titles.length; i++)
-              ListTile(
-                leading: Icon(_navIcons[i],
-                    color: selectedIndex == i ? kPinkPrimary : Colors.grey),
-                title: Text(
-                  i == 0 ? 'Dashboard' : _titles[i],
-                  style: TextStyle(
-                    color: selectedIndex == i ? kPinkPrimary : null,
-                    fontWeight:
-                        selectedIndex == i ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-                selected: selectedIndex == i,
-                selectedTileColor: kPinkSoft.withOpacity(0.5),
-                onTap: () {
-                  onIndexChanged(i);
-                  Navigator.pop(context);
-                },
-              ),
-            const Divider(),
             ListTile(
               leading: const Icon(Icons.storefront_outlined, color: Colors.grey),
               title: const Text('Bakery Information'),
@@ -205,13 +185,6 @@ class HomeShell extends StatelessWidget {
           : null,
     );
   }
-
-  static const List<IconData> _navIcons = [
-    Icons.home_rounded,
-    Icons.inventory_2_rounded,
-    Icons.bar_chart_rounded,
-    Icons.settings_rounded,
-  ];
 }
 
 // ---------------------------------------------------------------------------
