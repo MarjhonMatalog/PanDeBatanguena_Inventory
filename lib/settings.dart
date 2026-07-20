@@ -146,7 +146,7 @@ class AboutPage extends StatelessWidget {
                   radius: 40,
                   backgroundColor: Colors.white,
                   child: ClipOval(
-                    child: BakeryLogo(size: 64),
+                    child: BakeryLogo(size: 64, mark: true),
                   ),
                 ),
                 const SizedBox(height: 16),

@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-// ---------------------------------------------------------------------------
 // Stock Movement model (drives Recent Activity + Weekly Stock Movement)
-// ---------------------------------------------------------------------------
 class StockMovement {
   StockMovement({
     required this.id,

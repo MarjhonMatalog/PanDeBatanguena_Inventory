@@ -4,9 +4,7 @@ import 'constants.dart';
 import 'edit_product.dart';
 import 'product.dart';
 
-// ---------------------------------------------------------------------------
 // Inventory
-// ---------------------------------------------------------------------------
 class InventoryPage extends StatefulWidget {
   const InventoryPage({
     super.key,
@@ -132,10 +130,6 @@ class _InventoryPageState extends State<InventoryPage> {
                                         Text('${product.category} • ₱${product.price.toStringAsFixed(0)}',
                                             style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                         const SizedBox(height: 6),
-                                        // Feature 2: inline quantity stepper.
-                                        // Tapping these buttons never opens
-                                        // Product Details — only the quantity
-                                        // is affected.
                                         Row(
                                           children: [
                                             _QuantityStepButton(
@@ -214,7 +208,6 @@ class _InventoryPageState extends State<InventoryPage> {
   }
 }
 
-/// Small circular +/- button used by the inline inventory quantity stepper.
 class _QuantityStepButton extends StatelessWidget {
   const _QuantityStepButton({required this.icon, required this.onPressed});
 
@@ -325,7 +318,7 @@ Future<void> showLowStockWarning(BuildContext context, Product product) {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: const Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.orange),
+          Icon(Icons.warning_amber_rounded, color: Color.fromARGB(255, 221, 116, 174)),
           SizedBox(width: 8),
           Text('Low Stock Warning'),
         ],
@@ -340,8 +333,6 @@ Future<void> showLowStockWarning(BuildContext context, Product product) {
   );
 }
 
-/// Feature 3: improved Restock dialog with inline validation
-/// (quantity must be greater than zero).
 Future<int?> showRestockDialog(BuildContext context, Product product) {
   final controller = TextEditingController();
   return showDialog<int>(
@@ -351,31 +342,53 @@ Future<int?> showRestockDialog(BuildContext context, Product product) {
         String? errorText;
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text('Restock Product'),
+          titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+          contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+          title: Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: kPinkSoft,
+                child: const Icon(Icons.add_shopping_cart_rounded, color: kPinkPrimary, size: 18),
+              ),
+              const SizedBox(width: 10),
+              const Text('Restock Product', style: TextStyle(fontSize: 17)),
+            ],
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 4),
+              Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               const SizedBox(height: 4),
               Text('Current Quantity: ${product.quantity} pcs',
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              const Divider(height: 24),
+              const Divider(height: 28),
               const Text('QUANTITY TO ADD',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
+              const SizedBox(height: 8),
               TextField(
                 controller: controller,
                 keyboardType: TextInputType.number,
+                autofocus: true,
+                style: const TextStyle(fontWeight: FontWeight.w600),
                 decoration: InputDecoration(
                   hintText: 'Enter quantity...',
                   errorText: errorText,
+                  prefixIcon: const Icon(Icons.add_rounded, size: 20),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                 ),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey.shade700),
+              child: const Text('Cancel'),
+            ),
             FilledButton(
               onPressed: () {
                 final qty = int.tryParse(controller.text);
@@ -385,6 +398,7 @@ Future<int?> showRestockDialog(BuildContext context, Product product) {
                 }
                 Navigator.pop(context, qty);
               },
+              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
               child: const Text('Restock'),
             ),
           ],

@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// ---------------------------------------------------------------------------
 // Product model
-// ---------------------------------------------------------------------------
 class Product {
   Product({
     required this.id,
@@ -26,17 +24,12 @@ class Product {
   final DateTime dateAdded;
   final DateTime? expirationDate;
 
-  /// Status is always derived, never stored/hardcoded:
-  /// quantity == 0            -> Out of Stock
-  /// quantity <= minStock     -> Low Stock
-  /// otherwise                -> In Stock
   String get status {
     if (quantity == 0) return 'Out of Stock';
     if (quantity <= minStock) return 'Low Stock';
     return 'In Stock';
   }
 
-  /// Builds a [Product] from a Firestore document snapshot.
   factory Product.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? <String, dynamic>{};
     return Product(
@@ -44,9 +37,6 @@ class Product {
       name: data['name'] as String? ?? '',
       category: data['category'] as String? ?? 'Cakes',
       quantity: (data['quantity'] as num?)?.toInt() ?? 0,
-      // NOTE: the Firestore field is `minimumStock`; it maps to the Dart
-      // `minStock` property here and in toFirestore() below. This mapping
-      // is intentional — do not rename either side or add a duplicate field.
       minStock: (data['minimumStock'] as num?)?.toInt() ?? 0,
       price: (data['price'] as num?)?.toDouble() ?? 0.0,
       supplier: data['supplier'] as String? ?? '',
@@ -55,8 +45,6 @@ class Product {
     );
   }
 
-  /// Converts this [Product] into a Firestore-compatible map.
-  /// `status` is intentionally omitted — it's always calculated.
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,

@@ -244,64 +244,31 @@ class _LowStockGateState extends State<LowStockGate> {
 
     if (_isDialogOpen) return;
 
-    for (final product in widget.products) {
-      if (product.status == 'Low Stock' && !_dialogShownFor.contains(product.id)) {
-        _dialogShownFor.add(product.id);
-        widget.inventoryService.logLowStock(product.id, product.name, product.quantity);
-        _showDialogFor(product);
-        break;
-      }
+    // Gather every currently-low product that hasn't been surfaced yet and
+    // show them together in a single dialog, instead of one popup per item.
+    final newlyLow = widget.products
+        .where((p) => p.status == 'Low Stock' && !_dialogShownFor.contains(p.id))
+        .toList();
+
+    if (newlyLow.isEmpty) return;
+
+    for (final product in newlyLow) {
+      _dialogShownFor.add(product.id);
+      widget.inventoryService.logLowStock(product.id, product.name, product.quantity);
     }
+    _showLowStockDialog(newlyLow);
   }
 
-  Future<void> _showDialogFor(Product product) async {
+  Future<void> _showLowStockDialog(List<Product> products) async {
     _isDialogOpen = true;
-    final action = await showDialog<String>(
+    await showDialog<void>(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Low Stock Alert'),
-          ],
-        ),
-        content: Text(
-          '${product.name} is running low on stock.\n\n'
-          'Current Quantity: ${product.quantity}\n\n'
-          'Would you like to restock this item now?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'later'),
-            child: const Text('Restock Later'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, 'restock'),
-            child: const Text('Restock'),
-          ),
-        ],
+      builder: (_) => _LowStockAlertDialog(
+        products: products,
+        inventoryService: widget.inventoryService,
       ),
     );
     _isDialogOpen = false;
-
-    if (action == 'restock' && mounted) {
-      final qty = await showRestockDialog(context, product);
-      if (qty != null && qty > 0) {
-        await widget.inventoryService.restockProduct(
-          product.id,
-          product.name,
-          product.quantity,
-          qty,
-        );
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Product restocked successfully')),
-          );
-        }
-      }
-    }
 
     if (mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _checkLowStock());
@@ -310,6 +277,219 @@ class _LowStockGateState extends State<LowStockGate> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+// ---------------------------------------------------------------------------
+// Low Stock Alert dialog — shows every product that just crossed into Low
+// Stock in one card instead of stacking popups one after another. Each row
+// has its own inline Restock button so restocking one item doesn't close
+// the dialog or interrupt review of the rest; the dialog auto-closes once
+// every item in the batch has been restocked or dismissed.
+// ---------------------------------------------------------------------------
+class _LowStockAlertDialog extends StatefulWidget {
+  const _LowStockAlertDialog({required this.products, required this.inventoryService});
+
+  final List<Product> products;
+  final FirestoreInventoryService inventoryService;
+
+  @override
+  State<_LowStockAlertDialog> createState() => _LowStockAlertDialogState();
+}
+
+class _LowStockAlertDialogState extends State<_LowStockAlertDialog> {
+  late final List<Product> _items = List.of(widget.products);
+  final Set<String> _restocking = {};
+
+  Future<void> _restock(Product product) async {
+    final qty = await showRestockDialog(context, product);
+    if (qty == null || qty <= 0) return;
+
+    setState(() => _restocking.add(product.id));
+    await widget.inventoryService.restockProduct(
+      product.id,
+      product.name,
+      product.quantity,
+      qty,
+    );
+    if (!mounted) return;
+
+    setState(() {
+      _restocking.remove(product.id);
+      _items.removeWhere((p) => p.id == product.id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${product.name} restocked successfully')),
+    );
+
+    // Once every item in the batch has been handled, close automatically.
+    if (_items.isEmpty) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const warningColor = Colors.orange;
+    final count = _items.length;
+
+    return Dialog(
+      backgroundColor: isDark ? kDarkCard : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 520),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: warningColor.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.warning_amber_rounded, color: warningColor, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Low Stock Alert',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: inkOn(context),
+                          ),
+                        ),
+                        Text(
+                          count == 0
+                              ? 'All caught up'
+                              : count == 1
+                                  ? '1 item needs restocking'
+                                  : '$count items need restocking',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.white70 : Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Flexible(
+                child: count == 0
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            'Every item has been restocked. 🎉',
+                            style: TextStyle(color: isDark ? Colors.white70 : Colors.grey.shade600),
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: _items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (_, index) {
+                          final product = _items[index];
+                          final isBusy = _restocking.contains(product.id);
+                          return Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: warningColor.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: warningColor.withOpacity(0.25)),
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: kPinkSoft,
+                                  child: Icon(
+                                    product.category == 'Cakes'
+                                        ? Icons.cake_rounded
+                                        : Icons.bakery_dining_rounded,
+                                    color: kPinkPrimary,
+                                    size: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.name,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                          color: inkOn(context),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        '${product.quantity} pcs left',
+                                        style: const TextStyle(fontSize: 11, color: warningColor),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  height: 32,
+                                  child: OutlinedButton(
+                                    onPressed: isBusy ? null : () => _restock(product),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: warningColor,
+                                      side: BorderSide(color: warningColor.withOpacity(0.5)),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    child: isBusy
+                                        ? const SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: warningColor,
+                                            ),
+                                          )
+                                        : const Text('Restock', style: TextStyle(fontSize: 12)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: isDark ? kInkDark : kInk,
+                  side: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                ),
+                child: Text(count == 0 ? 'Close' : 'Restock Later'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------

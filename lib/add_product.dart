@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'product.dart';
 
-// ---------------------------------------------------------------------------
 // Add Product
-// ---------------------------------------------------------------------------
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key, required this.onSave});
 

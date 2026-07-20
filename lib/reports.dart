@@ -7,9 +7,7 @@ import 'firestore_inventory_service.dart';
 import 'product.dart';
 import 'stock_movement.dart';
 
-// ---------------------------------------------------------------------------
 // Reports
-// ---------------------------------------------------------------------------
 class ReportsPage extends StatelessWidget {
   const ReportsPage({super.key, required this.products, required this.inventoryService});
 
@@ -25,7 +23,6 @@ class ReportsPage extends StatelessWidget {
 
     final cakesQty = products.where((p) => p.category == 'Cakes').fold<int>(0, (s, p) => s + p.quantity);
     final pastriesQty = products.where((p) => p.category == 'Pastries').fold<int>(0, (s, p) => s + p.quantity);
-    final other = math.max(0, totalItems - cakesQty - pastriesQty);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -72,7 +69,6 @@ class ReportsPage extends StatelessWidget {
                       slices: [
                         DonutSlice('Cakes', cakesQty.toDouble(), kPinkPrimary),
                         DonutSlice('Pastries', pastriesQty.toDouble(), Colors.deepOrangeAccent),
-                        DonutSlice('Other', other.toDouble(), Colors.grey.shade300),
                       ],
                     ),
                   ),
@@ -81,9 +77,6 @@ class ReportsPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Feature 4: Weekly Stock Movement is now driven by real
-          // `stock_movements` Firestore data via a live stream, grouped by
-          // weekday for the current week (Mon–Sun). No hardcoded values.
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -141,7 +134,6 @@ class ReportsPage extends StatelessWidget {
     );
   }
 
-  /// Buckets movements into Mon..Sun counts for the current calendar week.
   List<double> _weeklyMovementCounts(List<StockMovement> movements) {
     final now = DateTime.now();
     final startOfWeek = DateTime(now.year, now.month, now.day)
@@ -309,9 +301,7 @@ class WeeklyBarChart extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Feature 5: Weekly Summary page
-// ---------------------------------------------------------------------------
+// Weekly Summary page
 class WeeklySummaryPage extends StatelessWidget {
   const WeeklySummaryPage({
     super.key,
@@ -389,9 +379,7 @@ class _SummaryTile extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Feature 6: Low Stock Report page
-// ---------------------------------------------------------------------------
+//Low Stock Report page
 class LowStockReportPage extends StatelessWidget {
   const LowStockReportPage({super.key, required this.inventoryService});
 

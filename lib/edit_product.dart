@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 import 'product.dart';
 
-// ---------------------------------------------------------------------------
 // Edit Product
-// ---------------------------------------------------------------------------
 class EditProductScreen extends StatefulWidget {
   const EditProductScreen({super.key, required this.product, required this.onSave});
 
@@ -28,9 +26,6 @@ class _EditProductScreenState extends State<EditProductScreen>
 
   final _formKey = GlobalKey<FormState>();
 
-  // Fixed supplier value — no longer user-editable, consistent with
-  // AddProductScreen. Every save re-assigns this value regardless of what
-  // was previously stored for this product.
   static const String _fixedSupplier = 'Pan de Batanguena';
 
   late final AnimationController _entranceController;

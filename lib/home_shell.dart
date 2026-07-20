@@ -8,9 +8,7 @@ import 'product.dart';
 import 'reports.dart';
 import 'settings.dart';
 
-// ---------------------------------------------------------------------------
 // Home Shell (Dashboard / Inventory / Reports / Settings / About)
-// ---------------------------------------------------------------------------
 class HomeShell extends StatelessWidget {
   const HomeShell({
     super.key,
@@ -114,7 +112,7 @@ class HomeShell extends StatelessWidget {
                     radius: 28,
                     backgroundColor: Colors.white,
                     child: ClipOval(
-                      child: BakeryLogo(size: 44),
+                      child: BakeryLogo(size: 44, mark: true),
                     ),
                   ),
                   const SizedBox(height: 12),

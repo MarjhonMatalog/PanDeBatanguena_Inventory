@@ -5,9 +5,7 @@ import 'edit_product.dart';
 import 'inventory.dart';
 import 'product.dart';
 
-// ---------------------------------------------------------------------------
 // Product Details
-// ---------------------------------------------------------------------------
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({
     super.key,
@@ -36,15 +34,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   void initState() {
     super.initState();
     _product = widget.product;
-  }
-
-  Future<void> _addStock() async {
-    final updated = await widget.onAdjustStock(_product, 1);
-    setState(() {
-      _product = updated;
-      _stockHistory.insert(0, 'Added 1 unit — now ${updated.quantity} pcs');
-    });
-    if (mounted) await showSuccessDialog(context, 'Inventory Updated Successfully');
   }
 
   Future<void> _reduceStock() async {
@@ -143,13 +132,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             Row(
               children: [
                 Expanded(
-                    child: OutlinedButton(onPressed: _addStock, child: const Text('Add Stock'))),
-                const SizedBox(width: 8),
+                  flex: 1,
+                  child: OutlinedButton.icon(
+                    onPressed: _reduceStock,
+                    icon: const Icon(Icons.remove_circle_outline, size: 18),
+                    label: const Text('Reduce'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: kPinkPrimary,
+                      side: BorderSide(color: kPinkPrimary.withOpacity(0.5)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
                 Expanded(
-                    child: OutlinedButton(onPressed: _reduceStock, child: const Text('Reduce Stock'))),
-                const SizedBox(width: 8),
-                Expanded(
-                    child: FilledButton(onPressed: _restock, child: const Text('Restock'))),
+                  flex: 2,
+                  child: FilledButton.icon(
+                    onPressed: _restock,
+                    icon: const Icon(Icons.add_circle_outline, size: 18),
+                    label: const Text('Restock'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),

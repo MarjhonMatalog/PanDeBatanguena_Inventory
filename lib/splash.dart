@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'constants.dart';
 
-// ---------------------------------------------------------------------------
 // Splash Screen
-// ---------------------------------------------------------------------------
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -33,9 +31,9 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 100,
-              height: 100,
-              padding: const EdgeInsets.all(12),
+              width: 150,
+              height: 150,
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
@@ -44,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   width: 1.4,
                 ),
               ),
-              child: BakeryLogo(size: 76),
+              child: BakeryLogo(size: 122),
             ),
             const SizedBox(height: 24),
             Text(

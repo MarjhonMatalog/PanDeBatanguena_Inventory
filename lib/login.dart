@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'constants.dart';
 
-// ---------------------------------------------------------------------------
 // Login Screen
-// ---------------------------------------------------------------------------
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -43,14 +41,14 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Center(
                   child: Container(
-                    width: 80,
-                    height: 80,
-                    padding: const EdgeInsets.all(10),
+                    width: 118,
+                    height: 118,
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                    child: BakeryLogo(size: 60),
+                    child: BakeryLogo(size: 94),
                   ),
                 ),
                 const SizedBox(height: 24),

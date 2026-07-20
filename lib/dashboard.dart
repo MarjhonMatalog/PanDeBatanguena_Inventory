@@ -5,9 +5,7 @@ import 'firestore_inventory_service.dart';
 import 'product.dart';
 import 'stock_movement.dart';
 
-// ---------------------------------------------------------------------------
 // Dashboard
-// ---------------------------------------------------------------------------
 class DashboardPage extends StatelessWidget {
   const DashboardPage({
     super.key,
@@ -88,9 +86,6 @@ String _timeAgo(DateTime timestamp) {
   return '${diff.inDays}d ago';
 }
 
-/// Displays the four top-level inventory statistic cards. Values are
-/// derived directly from the live product list — nothing is hardcoded.
-/// Double-tapping a card opens the matching product list in a bottom sheet.
 class DashboardStatsWidget extends StatelessWidget {
   const DashboardStatsWidget({super.key, required this.products});
 
