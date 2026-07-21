@@ -23,9 +23,6 @@ class DashboardPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Statistics are calculated live from the Firestore-backed
-          // `products` stream — never hardcoded. Double-tap any card to
-          // view the matching products.
           DashboardStatsWidget(products: products),
           const SizedBox(height: 20),
           Text('Recent Activity',
@@ -265,9 +262,6 @@ void showProductListSheet(
   );
 }
 
-/// A single product row used inside inventory status bottom sheets.
-/// Status color follows the rule: green = In Stock, orange = Low Stock,
-/// red = Out of Stock.
 class ProductTileWidget extends StatelessWidget {
   const ProductTileWidget({
     super.key,

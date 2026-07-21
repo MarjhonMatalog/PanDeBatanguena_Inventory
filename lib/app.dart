@@ -24,7 +24,6 @@ class _SweetStockAppState extends State<SweetStockApp> {
   Color _accentColor = kPinkPrimary;
   bool _notificationsEnabled = true;
 
-  // Firestore-backed inventory service. All product CRUD flows through here.
   final FirestoreInventoryService _inventoryService = FirestoreInventoryService();
 
   int _selectedIndex = 0;
@@ -75,9 +74,6 @@ class _SweetStockAppState extends State<SweetStockApp> {
 
     ThemeData buildTheme(Brightness brightness) {
       final isDark = brightness == Brightness.dark;
-      // In dark mode we seed with the bakery purple (matching the logo)
-      // instead of the pink accent, since pink-on-black reads muddier than
-      // pink-on-white. Light mode is unchanged.
       final scheme = ColorScheme.fromSeed(
         seedColor: isDark ? kPurplePrimary : _accentColor,
         brightness: brightness,
@@ -133,9 +129,6 @@ class _SweetStockAppState extends State<SweetStockApp> {
     return MaterialApp(
       title: kAppName,
       debugShowCheckedModeBanner: false,
-      // Adaptive dark mode: follow the device's system setting automatically.
-      // No manual in-app toggle — Android/iOS system settings are the source
-      // of truth, per Material 3 guidance.
       themeMode: ThemeMode.system,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
@@ -192,12 +185,7 @@ class _SweetStockAppState extends State<SweetStockApp> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Low Stock Gate — watches the live product stream and automatically shows
-// the Low Stock Alert dialog the first time a product crosses into the
-// "Low Stock" status. It resets so the dialog can fire again the next time
-// the same product dips low after being restocked above the threshold.
-// ---------------------------------------------------------------------------
+// Low Stock Gate 
 class LowStockGate extends StatefulWidget {
   const LowStockGate({
     super.key,
@@ -238,14 +226,10 @@ class _LowStockGateState extends State<LowStockGate> {
         .map((p) => p.id)
         .toSet();
 
-    // A product that is no longer low stock (restocked, or fell to zero)
-    // clears its "already shown" flag so the alert can fire again later.
     _dialogShownFor.removeWhere((id) => !currentLowIds.contains(id));
 
     if (_isDialogOpen) return;
 
-    // Gather every currently-low product that hasn't been surfaced yet and
-    // show them together in a single dialog, instead of one popup per item.
     final newlyLow = widget.products
         .where((p) => p.status == 'Low Stock' && !_dialogShownFor.contains(p.id))
         .toList();
@@ -279,13 +263,7 @@ class _LowStockGateState extends State<LowStockGate> {
   Widget build(BuildContext context) => widget.child;
 }
 
-// ---------------------------------------------------------------------------
-// Low Stock Alert dialog — shows every product that just crossed into Low
-// Stock in one card instead of stacking popups one after another. Each row
-// has its own inline Restock button so restocking one item doesn't close
-// the dialog or interrupt review of the rest; the dialog auto-closes once
-// every item in the batch has been restocked or dismissed.
-// ---------------------------------------------------------------------------
+// Low Stock Alert dialog 
 class _LowStockAlertDialog extends StatefulWidget {
   const _LowStockAlertDialog({required this.products, required this.inventoryService});
 
@@ -320,8 +298,6 @@ class _LowStockAlertDialogState extends State<_LowStockAlertDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${product.name} restocked successfully')),
     );
-
-    // Once every item in the batch has been handled, close automatically.
     if (_items.isEmpty) Navigator.of(context).pop();
   }
 
@@ -491,10 +467,6 @@ class _LowStockAlertDialogState extends State<_LowStockAlertDialog> {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Loading / Error states for the Firestore-backed home stream
-// ---------------------------------------------------------------------------
 class InventoryLoadingScreen extends StatelessWidget {
   const InventoryLoadingScreen({super.key});
 

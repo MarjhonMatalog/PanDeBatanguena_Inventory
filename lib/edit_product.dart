@@ -251,11 +251,6 @@ class _EditProductScreenState extends State<EditProductScreen>
       );
 }
 
-// ---------------------------------------------------------------------------
-// Section card wrapper — private to EditProductScreen. Groups related
-// fields under a titled, rounded, softly-shadowed card consistent with the
-// app's existing pink theme (matches AddProductScreen's styling).
-// ---------------------------------------------------------------------------
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.title,
@@ -308,11 +303,6 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Modern animated Update button — private to EditProductScreen. Full-width,
-// Material 3–styled, with a subtle press-scale animation layered on top of
-// the normal ripple, and an AnimatedSwitcher-driven loading state.
-// ---------------------------------------------------------------------------
 class _ModernUpdateButton extends StatefulWidget {
   const _ModernUpdateButton({
     required this.isLoading,

@@ -112,7 +112,12 @@ class HomeShell extends StatelessWidget {
                     radius: 28,
                     backgroundColor: Colors.white,
                     child: ClipOval(
-                      child: BakeryLogo(size: 44, mark: true),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -158,10 +163,6 @@ class HomeShell extends StatelessWidget {
           ],
         ),
       ),
-      // _AnimatedTabBody keeps all four pages permanently alive via
-      // IndexedStack (so their StreamBuilders stay subscribed and never
-      // reload), and layers a Tween-driven fade/slide on top purely for the
-      // visual transition. Nothing is destroyed or rebuilt on tab switch.
       body: _AnimatedTabBody(index: selectedIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
@@ -184,13 +185,7 @@ class HomeShell extends StatelessWidget {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Tab body wrapper — keeps every tab's widget subtree permanently alive via
-// [IndexedStack] (so each page's StreamBuilder stays subscribed and never
-// shows a loading state again after its first load), while still animating
-// the tab switch itself using an explicit Tween-driven fade + slide.
-// ---------------------------------------------------------------------------
+// Tab body wrapper 
 class _AnimatedTabBody extends StatefulWidget {
   const _AnimatedTabBody({required this.index, required this.children});
 
@@ -226,9 +221,6 @@ class _AnimatedTabBodyState extends State<_AnimatedTabBody>
   void didUpdateWidget(covariant _AnimatedTabBody oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.index != widget.index) {
-      // Replay the tween from the start on every tab change. The
-      // IndexedStack below swaps instantly underneath; this animation is
-      // purely a visual transition layered on top of it.
       _controller.forward(from: 0);
     }
   }

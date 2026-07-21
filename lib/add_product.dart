@@ -24,8 +24,6 @@ class _AddProductScreenState extends State<AddProductScreen>
   DateTime? _expirationDate;
   bool _isSaving = false;
 
-  // Fixed supplier value — no longer user-editable. Every product added
-  // from this screen is attributed to the bakery itself.
   static const String _fixedSupplier = 'Pan de Batanguena';
 
   late final AnimationController _entranceController;
@@ -73,8 +71,6 @@ class _AddProductScreenState extends State<AddProductScreen>
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Firestore assigns the real document id on insert; this placeholder
-    // id is discarded by FirestoreInventoryService.addProduct().
     final product = Product(
       id: 'PRD-${DateTime.now().millisecondsSinceEpoch}',
       name: _nameController.text.trim(),
@@ -261,11 +257,6 @@ class _AddProductScreenState extends State<AddProductScreen>
       );
 }
 
-// ---------------------------------------------------------------------------
-// Section card wrapper — private to AddProductScreen. Groups related fields
-// under a titled, rounded, softly-shadowed card consistent with the app's
-// existing pink theme.
-// ---------------------------------------------------------------------------
 class _SectionCard extends StatelessWidget {
   const _SectionCard({
     required this.title,
@@ -318,11 +309,6 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Modern animated Save button — private to AddProductScreen. Full-width,
-// Material 3–styled, with a subtle press-scale animation layered on top of
-// the normal ripple, and an AnimatedSwitcher-driven loading state.
-// ---------------------------------------------------------------------------
 class _ModernSaveButton extends StatefulWidget {
   const _ModernSaveButton({
     required this.isLoading,
